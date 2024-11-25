@@ -16,7 +16,7 @@ CREATE TABLE client (
 	name VARCHAR(50) NOT NULL,
 	nick VARCHAR(25) NOT NULL,
 	email VARCHAR(50) UNIQUE NOT NULL,
-	password VARCHAR(50) NOT NULL,
+	password VARCHAR(255) NOT NULL,
 	sfw_status BOOLEAN NOT NULL,
 	acount_status BOOLEAN NOT NULL,
 	reputation INTEGER NOT NULL

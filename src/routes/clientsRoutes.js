@@ -1,16 +1,16 @@
 const express = require('express');
 const router = express.Router();
-const artistsController = require('../controllers/artistsController.js');
-const { validLoginData, validUserData } = require('../middlewares/loginArtist.js');
+const clientsController = require('../controllers/clientsController.js');
+const { validLoginData, validUserData } = require('../middlewares/loginClient.js');
 const { asyncErrorHandler } = require('../middlewares/errors.js');
 
-router.get('/', asyncErrorHandler(artistsController.getArtists));
-router.get('/:id', asyncErrorHandler( artistsController.getArtistByID));
-router.post('/login', validLoginData, asyncErrorHandler(artistsController.loginArtist));
-router.put('/:id',  asyncErrorHandler(artistsController.editArtist));
-router.put('/editInfo/:id', validUserData, asyncErrorHandler(artistsController.editArtistByArtist));
-router.put('/editInfoPass/:id', validUserData, asyncErrorHandler(artistsController.editArtistByArtist));
-router.delete('/:id', asyncErrorHandler(artistsController.deletArtistByArtist));
-router.post('/register', asyncErrorHandler(artistsController.registerArtist));
+router.get('/', asyncErrorHandler(clientsController.getClients));
+router.get('/:id', asyncErrorHandler( clientsController.getClientByID));
+router.post('/login', validLoginData, asyncErrorHandler(clientsController.loginClient));
+router.put('/:id',  asyncErrorHandler(clientsController.editClient));
+router.put('/editInfo/:id', validUserData, asyncErrorHandler(clientsController.editClientByClient));
+router.put('/editInfoPass/:id', validUserData, asyncErrorHandler(clientsController.editClientByClient));
+router.delete('/:id', asyncErrorHandler(clientsController.deletClientByClient));
+router.post('/register', asyncErrorHandler(clientsController.registerClient));
 
 module.exports = router;
