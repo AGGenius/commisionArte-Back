@@ -12,37 +12,37 @@ const getArtists = async (req, res) => {
 
 const getArtistByID = async (req, res) => {
     const { id } = req.params;
-    const result = await client.query('SELECT * FROM users WHERE id= $1', [id]);
+    const result = await client.query('SELECT * FROM artist WHERE id= $1', [id]);
 
     if (result.rows.length > 0) {
-        let user = result.rows[0];
-        delete user.password;
-        res.json(user);
+        let artist = result.rows[0];
+        delete artist.password;
+        res.json(artist);
     } else {
-        res.json({ estado: "Usuario no encontrado" })
+        res.json({ estado: "Artista no encontrado" })
     }
 }
 
 const editArtist = async (req, res) => {
     const { id } = req.params;
-    const { email, name, nick, type, active } = req.body;
+    const { name, nick, email, sfw_status, comm_status, acount_status, styles, reputation} = req.body;
 
-    await client.query('UPDATE users SET email = $2, name = $3, nick = $4, type = $5, active = $6 WHERE id = $1', [id, email, name, nick, type, active]);
-    res.json({ estado: "Usuario actualizado correctamente" });
+    await client.query('UPDATE artist SET name = $2, nick = $3, email = $4, sfw_status = $5, comm_status = $6, acount_status = $7, styles = $8, reputation = $9 WHERE id = $1', [id, name, nick, email, sfw_status, comm_status, acount_status, styles, reputation]);
+    res.json({ estado: "Artista actualizado correctamente" });
 }
 
 const editArtistByArtist = async (req, res) => {
     const { id } = req.params;
-    const { email, name, nick, active} = req.body;
+    const { name, nick, email, sfw_status, comm_status, acount_status, styles} = req.body;
 
     if(res.locals.verifiedUser) {
 
         if(res.locals.newPasword) {
             const newSecurePassword = await bcryp.hash(res.locals.newPasword, 10);
-            await client.query('UPDATE users SET email = $2, password = $3, name = $4, nick = $5, active = $6 WHERE id = $1', [id, email, newSecurePassword, name, nick, active]);
+            await client.query('UPDATE artist SET name = $2, nick = $3, email = $4, sfw_status = $5, comm_status = $6, acount_status = $7, styles = $8, password = $9 WHERE id = $1', [id, name, nick, email, sfw_status, comm_status, acount_status, styles, newSecurePassword]);
             res.json({ estado: "Usuario actualizado correctamente" });
         } else {
-            await client.query('UPDATE users SET email = $2, name = $3, nick = $4, active = $5 WHERE id = $1', [id, email, name, nick, active]);
+            await client.query('UPDATE artist SET name = $2, nick = $3, email = $4, sfw_status = $5, comm_status = $6, acount_status = $7, styles = $8 WHERE id = $1', [id, name, nick, email, sfw_status, comm_status, acount_status, styles]);
             res.json({ estado: "Usuario actualizado correctamente" });
         }
     } else {
@@ -53,23 +53,23 @@ const editArtistByArtist = async (req, res) => {
 const deletArtistByArtist = async (req, res) => {
     const { id } = req.params;
 
-    await client.query('DELETE FROM users WHERE id = $1', [id]);
+    await client.query('DELETE FROM artist WHERE id = $1', [id]);
     res.json({ estado: "Usuario borrado correctamente" });
 };
 
 const registerArtist = async (req, res) => {
-    const { email, password, name, nick } = req.body;
+    const { name, nick, email, password, sfw_status, comm_status, acount_status, styles, reputation} = req.body;
     const securePassword = await bcryp.hash(password, 10);
 
-    await client.query(`INSERT INTO users (active, email, password, name, nick, type) VALUES ($1, $2, $3, $4, $5, $6)`, [false, email, securePassword, name, nick, "user"]);
+    await client.query(`INSERT INTO artist (name, nick, email, password, sfw_status, comm_status, acount_status, styles, reputation) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)`, [name, nick, email, securePassword, sfw_status, comm_status, acount_status, styles, reputation]);
     res.json({ estado: "Usuario creado correctamente" });
 }
 
 const loginArtist = async (req, res) => {
-    const user = res.locals.verifiedUser;
+    const artist = res.locals.verifiedUser;
 
-    const token = jwt.sign({ id: user.id, email: user.email, type: user.type, active: user.active }, "secreto", { expiresIn: '1h' });
-    res.json({ token, userId: user.id });
+    const token = jwt.sign({ id: artist.id, email: artist.email, type: artist.type, active: artist.active }, "secreto", { expiresIn: '1h' });
+    res.json({ token, userId: artist.id });
 }
 
 

@@ -46,7 +46,7 @@ const validUserData = async (req, res, next) => {
 
     const user = result.rows[0];
 
-    if (!user.active) {
+    if (!user.acount_status) {
         return res.status(401).json({ estado: 'Usuario inactivo' });
     };
 
