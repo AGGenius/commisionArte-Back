@@ -21,10 +21,10 @@ const getStateCardsByID = async (req, res) => {
 
 const editStateCard = async (req, res) => {
     const { id } = req.params;
-    const { name, nick, email, sfw_status, acount_status, reputation} = req.body;
+    const { artist_id, client_id, status, commentary } = req.body;
 
-    await client.query('UPDATE client SET name = $2, nick = $3, email = $4, sfw_status = $5, acount_status = $6, reputation = $7 WHERE id = $1', [id, name, nick, email, sfw_status, acount_status, reputation]);
-    res.json({ estado: "Cliente actualizado correctamente" });
+    await client.query('UPDATE workCard SET artist_id = $2, client_id = $3, status = $4, commentary = $5 WHERE id = $1', [id, artist_id, client_id, status, commentary]);
+    res.json({ estado: "Tarjeta de trabajo actualizada correctamente" });
 }
 
 const deleteStateCard = async (req, res) => {
