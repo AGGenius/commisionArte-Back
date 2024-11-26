@@ -24,6 +24,7 @@ CREATE TABLE client (
 
 CREATE TABLE portfolio (
 	id SERIAL PRIMARY KEY,
+	name VARCHAR(50) NOT NULL,
 	artist_id INTEGER REFERENCES artist(id) ON DELETE CASCADE,
     location VARCHAR(255) NOT NULL,
 	styles VARCHAR(255) NOT NULL,
