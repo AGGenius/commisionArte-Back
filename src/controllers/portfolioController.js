@@ -13,7 +13,7 @@ const getPortfolioByID = async (req, res) => {
 
     if (result.rows.length > 0) {
         let portfolio = result.rows[0];
-        res.sendFile(portfolio.location);
+        res.json(portfolio);
     } else {
         res.json({ estado: "Cliente no encontrado" })
     }
