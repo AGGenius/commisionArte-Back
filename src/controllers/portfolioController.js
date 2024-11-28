@@ -1,4 +1,14 @@
 const client = require('../db.js');
+const multer = require('multer');
+
+var storage = multer.diskStorage({
+    destination: function (req, file, cb) {
+        cb(null, '/tmp/my-uploads') // your path
+    },
+    filename: function (req, file, cb) {
+        cb(null, file.fieldname + '-' + Date.now())
+    }
+});
 
 const getPortfolio = async (req, res) => {
     const result = await client.query('SELECT * FROM portfolio ORDER BY id');
@@ -23,7 +33,7 @@ const editPortfolio = async (req, res) => {
     const { id } = req.params;
     const { name, sfw_status, styles } = req.body;
 
-    await client.query('UPDATE portfolio SET name = $2, sfw_status = $3, styles = $4 WHERE id = $1', [id, name, sfw_status, styles ]);
+    await client.query('UPDATE portfolio SET name = $2, sfw_status = $3, styles = $4 WHERE id = $1', [id, name, sfw_status, styles]);
     res.json({ estado: "Imagen actualizada correctamente" });
 }
 
@@ -35,31 +45,13 @@ const deletePortfolio = async (req, res) => {
 };
 
 const uploadPortfolio = async (req, res) => {
-
     //Postman doest work on this, I have to wait to have the frontend.
-    const { name, artist_id, styles, password, sfw_status } = req.body;
+    const { name, artist_id, styles, sfw_status } = req.body;
 
-    console.log(req.body)
-    if (!req.file) {
-        console.log("No file received");
-        return res.send({
-            success: false
-        });
+    const location = ('http://localhost:3000/' + res.locals.fileName);
 
-    } else {
-        console.log('file received');
-        return res.send({
-            success: true
-        })
-    }
-    
-
-    //await client.query(`INSERT INTO client (name, nick, email, password, sfw_status, acount_status, reputation) VALUES ($1, $2, $3, $4, $5, $6, $7)`, [name, nick, email, securePassword, sfw_status, acount_status, reputation]);
-    //res.json({ estado: "Cliente creado correctamente" });
-
-
-    //To store the new file. I need to make it to save in the DDBB the location as the "location"
-    
+    await client.query(`INSERT INTO portfolio (name, artist_id, location, styles, sfw_status) VALUES ($1, $2, $3, $4, $5)`, [name, artist_id, location, styles, sfw_status]);
+    res.json({ estado: "Imagen guardada correctamente" });
 }
 
-module.exports = { getPortfolio, getPortfolioByID, editPortfolio, deletePortfolio, uploadPortfolio}
+module.exports = { getPortfolio, getPortfolioByID, editPortfolio, deletePortfolio, uploadPortfolio }
