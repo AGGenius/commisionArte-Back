@@ -68,7 +68,7 @@ const registerClient = async (req, res) => {
 const loginClient = async (req, res) => {
     const artist = res.locals.verifiedUser;
 
-    const token = jwt.sign({ id: artist.id, email: artist.email, type: artist.type, active: artist.active }, "secreto", { expiresIn: '1h' });
+    const token = jwt.sign({ id: artist.id, email: artist.email, type: artist.acount_type, active: artist.acount_status }, "secreto", { expiresIn: '1h' });
     res.json({ token, userId: artist.id });
 }
 
