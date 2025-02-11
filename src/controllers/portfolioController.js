@@ -25,8 +25,16 @@ const getPortfolioByID = async (req, res) => {
         let portfolio = result.rows[0];
         res.json(portfolio);
     } else {
-        res.json({ estado: "Cliente no encontrado" })
+        res.json({ estado: "Imagen no encontrada" })
     }
+}
+
+const getPortfolioByArtistID = async (req, res) => {
+    const { artist_id } = req.params;
+    const result = await client.query('SELECT * FROM portfolio WHERE artist_id= $1 ORDER BY id', [artist_id]);
+
+    let portfolio = result.rows;
+    res.json(portfolio);
 }
 
 const editPortfolio = async (req, res) => {
@@ -54,4 +62,4 @@ const uploadPortfolio = async (req, res) => {
     res.json({ estado: "Imagen guardada correctamente" });
 }
 
-module.exports = { getPortfolio, getPortfolioByID, editPortfolio, deletePortfolio, uploadPortfolio }
+module.exports = { getPortfolio, getPortfolioByID, getPortfolioByArtistID, editPortfolio, deletePortfolio, uploadPortfolio }

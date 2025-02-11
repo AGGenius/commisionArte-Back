@@ -5,6 +5,7 @@ const { asyncErrorHandler } = require('../middlewares/errors.js');
 
 router.get('/', asyncErrorHandler(openWorksController.getOpenWork));
 router.get('/:id', asyncErrorHandler( openWorksController.getOpenWorkByID));
+router.get('/client/:client_id', asyncErrorHandler( openWorksController.getOpenWorkByClientID));
 router.put('/:id', asyncErrorHandler(openWorksController.editOpenWork));
 router.delete('/:id', asyncErrorHandler(openWorksController.deleteOpenWork));
 router.post('/upload', asyncErrorHandler(openWorksController.uploadOpenWork));

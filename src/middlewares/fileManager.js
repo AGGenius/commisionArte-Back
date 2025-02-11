@@ -2,7 +2,7 @@ const multer = require('multer');
 
 const storage = multer.diskStorage({
     destination: function (req, file, callback) {
-        callback(null, 'C:/Users/Adrian/Desktop/PersonalProjects/CommisionArte-Back/uploads');
+        callback(null, 'C:/Users/Garo/Desktop/PersonalProjects/CommisionArte-Back/uploads');
     },
     filename: function (req, file, callback) {
         // You can write your own logic to define the filename here (before passing it into the callback), e.g:

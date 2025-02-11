@@ -6,6 +6,7 @@ const { upload } = require('../middlewares/fileManager.js');
 
 router.get('/', asyncErrorHandler(portfolioController.getPortfolio));
 router.get('/:id', asyncErrorHandler( portfolioController.getPortfolioByID));
+router.get('/artist/:artist_id', asyncErrorHandler( portfolioController.getPortfolioByArtistID));
 router.put('/:id', asyncErrorHandler(portfolioController.editPortfolio));
 router.delete('/:id', asyncErrorHandler(portfolioController.deletePortfolio));
 router.post('/upload', upload.any(), asyncErrorHandler(portfolioController.uploadPortfolio));

@@ -19,6 +19,14 @@ const getOpenWorkByID = async (req, res) => {
     }
 }
 
+const getOpenWorkByClientID = async (req, res) => {
+    const { client_id } = req.params;
+    const result = await client.query('SELECT * FROM openWork WHERE client_id= $1 ORDER BY id', [client_id]);
+
+    let openWork = result.rows;
+    res.json(openWork);
+}
+
 const editOpenWork = async (req, res) => {
     const { id } = req.params;
     const { artist_id, client_id, tittle, content, sfw_status } = req.body;
@@ -41,4 +49,4 @@ const uploadOpenWork = async (req, res) => {
     res.json({ estado: "Solicitud de trabajo creada correctamente" });
 }
 
-module.exports = { getOpenWork, getOpenWorkByID, editOpenWork, deleteOpenWork, uploadOpenWork}
+module.exports = { getOpenWork, getOpenWorkByID, getOpenWorkByClientID, editOpenWork, deleteOpenWork, uploadOpenWork}
