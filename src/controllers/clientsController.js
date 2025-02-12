@@ -58,10 +58,11 @@ const deletClientByClient = async (req, res) => {
 };
 
 const registerClient = async (req, res) => {
-    const { name, nick, email, password} = req.body;
+    const { name, nick, email, password, acountType} = req.body;
     const securePassword = await bcryp.hash(password, 10);
+    const registerDate = new Date().toISOString().slice(0, 19).replace('T', ' ');
 
-    await client.query(`INSERT INTO client (name, nick, email, password, sfw_status, acount_status, reputation) VALUES ($1, $2, $3, $4, $5, $6, $7)`, [name, nick, email, securePassword, true, true, 0]);
+    await client.query(`INSERT INTO client (name, nick, email, password, sfw_status, acount_type, acount_status, register, reputation) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)`, [name, nick, email, securePassword, true, acountType, true, registerDate , 0]);
     res.json({ estado: "Cliente creado correctamente" });
 }
 

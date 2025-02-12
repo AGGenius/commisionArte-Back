@@ -58,10 +58,11 @@ const deletArtistByArtist = async (req, res) => {
 };
 
 const registerArtist = async (req, res) => {
-    const { name, nick, email, password} = req.body;
+    const { name, nick, email, password, acountType} = req.body;
     const securePassword = await bcryp.hash(password, 10);
+    const registerDate = new Date().toISOString().slice(0, 19).replace('T', ' ');
 
-    await client.query(`INSERT INTO artist (name, nick, email, password, sfw_status, comm_status, acount_status, styles, reputation) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)`, [name, nick, email, securePassword, true, false, true, "empty", 0]);
+    await client.query(`INSERT INTO artist (name, nick, email, password, sfw_status, comm_status, acount_status, register, acount_type, styles, reputation) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)`, [name, nick, email, securePassword, true, false, true, registerDate, acountType, "empty", 0]);
     res.json({ estado: "Usuario creado correctamente" });
 }
 
