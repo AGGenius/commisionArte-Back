@@ -44,8 +44,9 @@ const deleteOpenWork = async (req, res) => {
 
 const uploadOpenWork = async (req, res) => {
     const { artist_id, client_id, tittle, content, sfw_status } = req.body;
+    const creationDate = new Date().toISOString().slice(0, 19).replace('T', ' ');
 
-    await client.query(`INSERT INTO openWork (artist_id, client_id, tittle, content, sfw_status) VALUES ($1, $2, $3, $4, $5)`, [artist_id, client_id, tittle, content, sfw_status]);
+    await client.query(`INSERT INTO openWork (artist_id, client_id, status, tittle, content, sfw_status, creation_date) VALUES ($1, $2, $3, $4, $5, $6, $7)`, [artist_id, client_id, "open", tittle, content, sfw_status, creationDate]);
     res.json({ estado: "Solicitud de trabajo creada correctamente" });
 }
 
