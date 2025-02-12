@@ -8,7 +8,7 @@ const openWorksLimit = async (req, res, next) => {
     console.log(result.rows.length)
 
     if (result.rows.length >= 5) {
-        return res.status(401).json({ estado: 'No es posible realizar mas de cinco solicitudes.' });
+        return res.status(401).json({ errors: 'No es posible realizar mas de cinco solicitudes.' });
     }
 
 	next();

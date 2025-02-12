@@ -7,19 +7,19 @@ const validLoginData = async (req, res, next) => {
     const result = await client.query('SELECT * FROM client WHERE email = $1', [email]);
 
     if (result.rows.length === 0) {
-        return res.status(401).json({ estado: 'Credenciales incorrectas' });
+        return res.status(401).json({ errors: 'Credenciales incorrectas' });
     }
 
     const clientData = result.rows[0];
 
     if (!clientData.acount_status) {
-        return res.status(401).json({ estado: 'Usuario inactivo' });
+        return res.status(401).json({ errors: 'Usuario inactivo' });
     };
 
     const verifiedUser = await bcryp.compare(password, clientData.password);
 
     if (!verifiedUser) {
-        return res.status(401).json({ estado: 'Credenciales incorrectas' });
+        return res.status(401).json({ errors: 'Credenciales incorrectas' });
     };
 
     res.locals.verifiedUser = clientData;
@@ -36,24 +36,24 @@ const validUserData = async (req, res, next) => {
         if(pass1 === pass2) {
             res.locals.newPasword = pass1;
         } else {      
-            return res.status(401).json({ estado: 'Las contraseñas no coinciden' });
+            return res.status(401).json({ errors: 'Las contraseñas no coinciden' });
         }
     }
 
     if (result.rows.length === 0) {
-        return res.status(401).json({ estado: 'Credenciales incorrectas' });
+        return res.status(401).json({ errors: 'Credenciales incorrectas' });
     }
 
     const clientData = result.rows[0];
 
     if (!clientData.acount_status) {
-        return res.status(401).json({ estado: 'Usuario inactivo' });
+        return res.status(401).json({ errors: 'Usuario inactivo' });
     };
 
     const verifiedUser = await bcryp.compare(password, clientData.password);
 
     if (!verifiedUser) {
-        return res.status(401).json({ estado: 'Credenciales incorrectas' });
+        return res.status(401).json({ errors: 'Credenciales incorrectas' });
     };
 
     res.locals.verifiedUser = clientData;
