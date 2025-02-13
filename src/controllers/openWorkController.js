@@ -27,11 +27,35 @@ const getOpenWorkByClientID = async (req, res) => {
     res.json(openWork);
 }
 
+//This is not updtaded.
 const editOpenWork = async (req, res) => {
     const { id } = req.params;
     const { artist_id, client_id, tittle, content, sfw_status } = req.body;
 
     await client.query('UPDATE openWork SET artist_id = $2, client_id = $3, tittle = $4, content = $5, sfw_status = $6 WHERE id = $1', [id, artist_id, client_id, tittle, content, sfw_status]);
+    res.json({ estado: "Solicitud de trabajo actualizada correctamente" });
+}
+
+const takeOpenWork = async (req, res) => {
+    const { id } = req.params;
+    let actualState = "";
+    const result = await client.query('SELECT * FROM openWork WHERE id= $1', [id]);
+
+    if (result.rows.length > 0) {
+        let openWork = result.rows[0];
+
+        actualState = openWork.status;
+
+        if (actualState === "open") {
+            await client.query('UPDATE openWork SET status = $2 WHERE id = $1', [id, "taken"]);
+        } else {
+            await client.query('UPDATE openWork SET status = $2 WHERE id = $1', [id, "open"]);
+        }
+
+    } else {
+        res.json({ estado: "Solicitud de trabajo de trabajo no encontrada" })
+    }
+
     res.json({ estado: "Solicitud de trabajo actualizada correctamente" });
 }
 
@@ -50,4 +74,4 @@ const uploadOpenWork = async (req, res) => {
     res.json({ estado: "Solicitud de trabajo creada correctamente" });
 }
 
-module.exports = { getOpenWork, getOpenWorkByID, getOpenWorkByClientID, editOpenWork, deleteOpenWork, uploadOpenWork}
+module.exports = { getOpenWork, getOpenWorkByID, getOpenWorkByClientID, editOpenWork, takeOpenWork, deleteOpenWork, uploadOpenWork }

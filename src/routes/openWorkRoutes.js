@@ -8,6 +8,7 @@ router.get('/', asyncErrorHandler(openWorksController.getOpenWork));
 router.get('/:id', asyncErrorHandler( openWorksController.getOpenWorkByID));
 router.get('/client/:client_id', asyncErrorHandler( openWorksController.getOpenWorkByClientID));
 router.put('/:id', asyncErrorHandler(openWorksController.editOpenWork));
+router.put('/take/:id', asyncErrorHandler( openWorksController.takeOpenWork));
 router.delete('/:id', asyncErrorHandler(openWorksController.deleteOpenWork));
 router.post('/upload', openWorksLimit, asyncErrorHandler(openWorksController.uploadOpenWork));
 
