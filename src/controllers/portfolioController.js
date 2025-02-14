@@ -1,5 +1,7 @@
 const client = require('../db.js');
 const multer = require('multer');
+const path = require("path");
+const sharp = require("sharp");
 
 var storage = multer.diskStorage({
     destination: function (req, file, cb) {
@@ -53,12 +55,24 @@ const deletePortfolio = async (req, res) => {
 };
 
 const uploadPortfolio = async (req, res) => {
-    //Postman doest work on this, I have to wait to have the frontend.
     const { name, artist_id, styles, sfw_status } = req.body;
+    const creationDate = new Date().toISOString().slice(0, 19).replace('T', ' ');
+
+    if (!req.files || req.files.length === 0) {
+        return res.status(400).json({ error: "No se subió ninguna imagen" });
+    }
+
+    const file = req.files[0];
+    const originalPath = file.path; 
+    const blurredFilename = `blurred_${file.filename}`;
+    const blurredPath = path.join(path.dirname(originalPath), blurredFilename);
+
+    await sharp(originalPath).blur(200).toFile(blurredPath);
 
     const location = ('http://localhost:3000/' + res.locals.fileName);
+    const blurredLocation = ('http://localhost:3000/' + blurredFilename);
 
-    await client.query(`INSERT INTO portfolio (name, artist_id, location, styles, sfw_status) VALUES ($1, $2, $3, $4, $5)`, [name, artist_id, location, styles, sfw_status]);
+    await client.query(`INSERT INTO portfolio (name, artist_id, location, styles, sfw_status, blurred_location, upload_date) VALUES ($1, $2, $3, $4, $5, $6, $7)`, [name, artist_id, location, styles, sfw_status, blurredLocation, creationDate]);
     res.json({ estado: "Imagen guardada correctamente" });
 }
 

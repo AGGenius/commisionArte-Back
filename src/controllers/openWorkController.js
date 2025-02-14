@@ -38,25 +38,34 @@ const editOpenWork = async (req, res) => {
 
 const takeOpenWork = async (req, res) => {
     const { id } = req.params;
+    const { artist_id } = req.body;
+
     let actualState = "";
     const result = await client.query('SELECT * FROM openWork WHERE id= $1', [id]);
 
     if (result.rows.length > 0) {
         let openWork = result.rows[0];
 
+        if(openWork.status === "taken" && openWork.artist_id != artist_id) { 
+            res.json({ estado: "Solicitud de trabajo ya no disponible." });
+            return;
+        }
+
         actualState = openWork.status;
 
         if (actualState === "open") {
-            await client.query('UPDATE openWork SET status = $2 WHERE id = $1', [id, "taken"]);
+            await client.query('UPDATE openWork SET status = $2, artist_id = $3 WHERE id = $1', [id, "taken", artist_id]);
+
+            res.json({ estado: "Solicitud de trabajo tomada correctamente" });
         } else {
-            await client.query('UPDATE openWork SET status = $2 WHERE id = $1', [id, "open"]);
+            await client.query('UPDATE openWork SET status = $2, artist_id = $3 WHERE id = $1', [id, "open", 0]);
+
+            res.json({ estado: "Solicitud de trabajo anulada correctamente" });
         }
 
     } else {
         res.json({ estado: "Solicitud de trabajo de trabajo no encontrada" })
     }
-
-    res.json({ estado: "Solicitud de trabajo actualizada correctamente" });
 }
 
 const deleteOpenWork = async (req, res) => {
