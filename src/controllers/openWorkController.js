@@ -68,6 +68,50 @@ const takeOpenWork = async (req, res) => {
     }
 }
 
+const declineOpenWork = async (req, res) => {
+    const { id } = req.params;
+
+    const result = await client.query('SELECT * FROM openWork WHERE id= $1', [id]);
+
+    if (result.rows.length > 0) {
+        let openWork = result.rows[0];
+
+        if(openWork.status !== "taken" || openWork.artist_id === 0) { 
+            res.json({ estado: "Solicitud de trabajo no aceptada actualmente." });
+            return;
+        }
+
+        await client.query('UPDATE openWork SET status = $2, artist_id = $3 WHERE id = $1', [id, "open", 0]);
+
+        res.json({ estado: "Solicitud de trabajo declinada correctamente" });
+
+    } else {
+        res.json({ estado: "Solicitud de trabajo de trabajo no encontrada" })
+    }
+}
+
+const confirmOpenWork = async (req, res) => {
+    const { id } = req.params;
+
+    const result = await client.query('SELECT * FROM openWork WHERE id= $1', [id]);
+
+    if (result.rows.length > 0) {
+        let openWork = result.rows[0];
+
+        if(openWork.status !== "taken" || openWork.artist_id === 0) { 
+            res.json({ estado: "Solicitud de trabajo no aceptada actualmente." });
+            return;
+        }
+
+        await client.query('UPDATE openWork SET status = $2 WHERE id = $1', [id, "confirmed"]);
+
+        res.json({ estado: "Solicitud de trabajo confirmada correctamente"});
+
+    } else {
+        res.json({ estado: "Solicitud de trabajo de trabajo no encontrada"})
+    }
+}
+
 const deleteOpenWork = async (req, res) => {
     const { id } = req.params;
 
@@ -83,4 +127,4 @@ const uploadOpenWork = async (req, res) => {
     res.json({ estado: "Solicitud de trabajo creada correctamente" });
 }
 
-module.exports = { getOpenWork, getOpenWorkByID, getOpenWorkByClientID, editOpenWork, takeOpenWork, deleteOpenWork, uploadOpenWork }
+module.exports = { getOpenWork, getOpenWorkByID, getOpenWorkByClientID, editOpenWork, takeOpenWork, declineOpenWork, confirmOpenWork, deleteOpenWork, uploadOpenWork }

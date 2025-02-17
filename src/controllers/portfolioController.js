@@ -62,6 +62,7 @@ const uploadPortfolio = async (req, res) => {
         return res.status(400).json({ error: "No se subió ninguna imagen" });
     }
 
+    //Add a check so it does it only on imgs with nsfw check. Maybe add compresion a resize.
     const file = req.files[0];
     const originalPath = file.path; 
     const blurredFilename = `blurred_${file.filename}`;

@@ -9,6 +9,8 @@ router.get('/:id', asyncErrorHandler( openWorksController.getOpenWorkByID));
 router.get('/client/:client_id', asyncErrorHandler( openWorksController.getOpenWorkByClientID));
 router.put('/:id', asyncErrorHandler(openWorksController.editOpenWork));
 router.put('/take/:id', asyncErrorHandler( openWorksController.takeOpenWork));
+router.put('/decline/:id', asyncErrorHandler( openWorksController.declineOpenWork));
+router.put('/confirm/:id', asyncErrorHandler( openWorksController.confirmOpenWork));
 router.delete('/:id', asyncErrorHandler(openWorksController.deleteOpenWork));
 router.post('/upload', openWorksLimit, asyncErrorHandler(openWorksController.uploadOpenWork));
 
