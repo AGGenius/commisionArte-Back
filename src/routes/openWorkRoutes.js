@@ -6,7 +6,9 @@ const { asyncErrorHandler } = require('../middlewares/errors.js');
 
 router.get('/', asyncErrorHandler(openWorksController.getOpenWork));
 router.get('/:id', asyncErrorHandler( openWorksController.getOpenWorkByID));
+router.get('/artist/:artist_id', asyncErrorHandler( openWorksController.getOpenWorTakenkByArtistID));
 router.get('/client/:client_id', asyncErrorHandler( openWorksController.getOpenWorkByClientID));
+router.get('/available/:artist_id', asyncErrorHandler( openWorksController.getOpenWorkAvailable));
 router.put('/:id', asyncErrorHandler(openWorksController.editOpenWork));
 router.put('/take/:id', asyncErrorHandler( openWorksController.takeOpenWork));
 router.put('/decline/:id', asyncErrorHandler( openWorksController.declineOpenWork));

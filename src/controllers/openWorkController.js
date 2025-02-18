@@ -19,6 +19,23 @@ const getOpenWorkByID = async (req, res) => {
     }
 }
 
+const getOpenWorkAvailable = async (req, res) => {
+    const { artist_id } = req.params;
+    const result = await client.query('SELECT * FROM openWork ow WHERE status = \'open\' AND NOT EXISTS (SELECT 1 FROM rejected_work rw WHERE rw.openWork_id = ow.id AND rw.artist_id = $1) ORDER BY id', [artist_id]);
+
+    let openWork = result.rows;
+    res.json(openWork);
+}
+
+
+const getOpenWorTakenkByArtistID = async (req, res) => {
+    const { artist_id } = req.params;
+    const result = await client.query('SELECT * FROM openWork WHERE artist_id = $1 AND status IN (\'taken\', \'confirmed\') ORDER BY id', [artist_id]);
+
+    let openWork = result.rows;
+    res.json(openWork);
+}
+
 const getOpenWorkByClientID = async (req, res) => {
     const { client_id } = req.params;
     const result = await client.query('SELECT * FROM openWork WHERE client_id= $1 ORDER BY id', [client_id]);
@@ -127,4 +144,4 @@ const uploadOpenWork = async (req, res) => {
     res.json({ estado: "Solicitud de trabajo creada correctamente" });
 }
 
-module.exports = { getOpenWork, getOpenWorkByID, getOpenWorkByClientID, editOpenWork, takeOpenWork, declineOpenWork, confirmOpenWork, deleteOpenWork, uploadOpenWork }
+module.exports = { getOpenWork, getOpenWorkByID, getOpenWorkAvailable, getOpenWorTakenkByArtistID, getOpenWorkByClientID, editOpenWork, takeOpenWork, declineOpenWork, confirmOpenWork, deleteOpenWork, uploadOpenWork }
