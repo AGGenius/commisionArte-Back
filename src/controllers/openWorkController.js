@@ -1,4 +1,5 @@
 const client = require('../db.js');
+const axios = require('axios');
 
 const getOpenWork = async (req, res) => {
     const result = await client.query('SELECT * FROM openWork ORDER BY id');
@@ -63,7 +64,7 @@ const takeOpenWork = async (req, res) => {
     if (result.rows.length > 0) {
         let openWork = result.rows[0];
 
-        if(openWork.status === "taken" && openWork.artist_id != artist_id) { 
+        if (openWork.status === "taken" && openWork.artist_id != artist_id) {
             res.json({ estado: "Solicitud de trabajo ya no disponible." });
             return;
         }
@@ -93,7 +94,7 @@ const declineOpenWork = async (req, res) => {
     if (result.rows.length > 0) {
         let openWork = result.rows[0];
 
-        if(openWork.status !== "taken" || openWork.artist_id === 0) { 
+        if (openWork.status !== "taken" || openWork.artist_id === 0) {
             res.json({ estado: "Solicitud de trabajo no aceptada actualmente." });
             return;
         }
@@ -109,25 +110,43 @@ const declineOpenWork = async (req, res) => {
 
 const confirmOpenWork = async (req, res) => {
     const { id } = req.params;
+    const payload = {
+        artist_id: req.body.artist_id,
+        client_id: req.body.client_id,
+        openWork_id: req.body.openWork_id,
+    };
 
-    const result = await client.query('SELECT * FROM openWork WHERE id= $1', [id]);
+    try {
+        const result = await client.query('SELECT * FROM openWork WHERE id= $1', [id]);
 
-    if (result.rows.length > 0) {
+        if (result.rows.length <= 0) {
+            res.json({ estado: "Solicitud de trabajo no encontrada" });
+            return;
+        }
+        
         let openWork = result.rows[0];
 
-        if(openWork.status !== "taken" || openWork.artist_id === 0) { 
+        if (openWork.status !== "taken" || openWork.artist_id === 0) {
             res.json({ estado: "Solicitud de trabajo no aceptada actualmente." });
             return;
         }
 
-        await client.query('UPDATE openWork SET status = $2 WHERE id = $1', [id, "confirmed"]);
+        try {
+            const response = await axios.post('http://localhost:3000/api/stateCards/upload/', payload);
 
-        res.json({ estado: "Solicitud de trabajo confirmada correctamente"});
-
-    } else {
-        res.json({ estado: "Solicitud de trabajo de trabajo no encontrada"})
+            if (response.status === 200) {
+                await client.query('UPDATE openWork SET status = $2 WHERE id = $1', [id, "confirmed"]);
+                res.json({ estado: "Solicitud de trabajo confirmada y tarjeta creada." });
+            } else {
+                res.json({ estado: "Error al confirmar la solicitud de trabajo" });
+            }
+        } catch (error) {
+            res.json({ estado: "Error al confirmar la solicitud de trabajo." });
+        }
+    } catch (error) {
+        res.json({ estado: "Error en la operación de confirmación." });
     }
-}
+};
 
 const deleteOpenWork = async (req, res) => {
     const { id } = req.params;

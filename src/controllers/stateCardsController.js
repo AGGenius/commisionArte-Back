@@ -35,10 +35,15 @@ const deleteStateCard = async (req, res) => {
 };
 
 const uploadStateCard = async (req, res) => {
-    const { artist_id, client_id, status, commentary } = req.body;
+    const { artist_id, client_id, openWork_id } = req.body;
+    
+    const creationDate = new Date().toISOString().slice(0, 19).replace('T', ' ');
+    const lastModificationDate = creationDate;
+    const status = "Recien creada";
+    const commentary = "Primera puesta en contacto"
 
-    await client.query(`INSERT INTO workCard (artist_id, client_id, status, commentary) VALUES ($1, $2, $3, $4)`, [artist_id, client_id, status, commentary]);
-    res.json({ estado: "Tarjeta de trabajo creada correctamente" });
+    await client.query(`INSERT INTO workCard (artist_id, client_id, openwork_id, status, commentary, creation_date, last_modification_date) VALUES ($1, $2, $3, $4, $5, $6, $7)`, [artist_id, client_id, openWork_id, status, commentary, creationDate, lastModificationDate]);
+    res.json({ estado: "Trabajo aceptado y tarjeta de trabajo creada correctamente" });
 }
 
 module.exports = { getStateCards, getStateCardsByID, editStateCard, deleteStateCard, uploadStateCard}
