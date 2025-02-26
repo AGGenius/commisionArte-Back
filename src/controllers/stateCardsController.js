@@ -19,6 +19,38 @@ const getStateCardsByID = async (req, res) => {
     }
 }
 
+
+//Tal vez modificar esto para solo usar un endpoint.
+const getStateCardsByArtistID = async (req, res) => {
+    const { artist_id } = req.params;
+
+    const result = await client.query(`
+        SELECT 
+          workCard.*, 
+          client.name AS client_name, 
+          artist.name AS artist_name, 
+          openWork.title AS work_title
+        FROM workCard
+        JOIN client ON workCard.client_id = client.id
+        JOIN artist ON workCard.artist_id = artist.id
+        JOIN openWork ON workCard.openwork_id = openWork.id
+        WHERE workCard.artist_id = $1
+        ORDER BY workCard.id
+      `, [artist_id]);
+
+    let workCard = result.rows;
+    res.json(workCard);
+}
+
+//Tal vez modificar esto para solo usar un endpoint.
+const getStateCardsClientID = async (req, res) => {
+    const { client_id } = req.params;
+    const result = await client.query('SELECT * FROM workCard WHERE client_id= $1 ORDER BY id', [client_id]);
+
+    let workCard = result.rows;
+    res.json(workCard);
+}
+
 const editStateCard = async (req, res) => {
     const { id } = req.params;
     const { artist_id, client_id, status, commentary } = req.body;
@@ -46,4 +78,4 @@ const uploadStateCard = async (req, res) => {
     res.json({ estado: "Trabajo aceptado y tarjeta de trabajo creada correctamente" });
 }
 
-module.exports = { getStateCards, getStateCardsByID, editStateCard, deleteStateCard, uploadStateCard}
+module.exports = { getStateCards, getStateCardsByID, getStateCardsClientID, getStateCardsByArtistID, editStateCard, deleteStateCard, uploadStateCard}
