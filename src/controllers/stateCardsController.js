@@ -56,6 +56,15 @@ const editStateCard = async (req, res) => {
     const { artist_id, client_id, status, commentary } = req.body;
 
     await client.query('UPDATE workCard SET artist_id = $2, client_id = $3, status = $4, commentary = $5 WHERE id = $1', [id, artist_id, client_id, status, commentary]);
+    res.json({ estado: "Tarjeta de trabajo modificada correctamente" });
+}
+
+const updateStateCard = async (req, res) => {
+    const { id } = req.params;
+    const { status, commentary } = req.body;
+    const lastModificationDate = new Date().toISOString().slice(0, 19).replace('T', ' ');
+
+    await client.query('UPDATE workCard SET status = $2, commentary = $3, last_modification_date = $4 WHERE id = $1', [id, status, commentary, lastModificationDate]);
     res.json({ estado: "Tarjeta de trabajo actualizada correctamente" });
 }
 
@@ -78,4 +87,4 @@ const uploadStateCard = async (req, res) => {
     res.json({ estado: "Trabajo aceptado y tarjeta de trabajo creada correctamente" });
 }
 
-module.exports = { getStateCards, getStateCardsByID, getStateCardsClientID, getStateCardsByArtistID, editStateCard, deleteStateCard, uploadStateCard}
+module.exports = { getStateCards, getStateCardsByID, getStateCardsClientID, getStateCardsByArtistID, editStateCard, updateStateCard, deleteStateCard, uploadStateCard}
