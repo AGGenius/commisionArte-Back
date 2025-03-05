@@ -45,7 +45,20 @@ const getStateCardsByArtistID = async (req, res) => {
 //Tal vez modificar esto para solo usar un endpoint.
 const getStateCardsClientID = async (req, res) => {
     const { client_id } = req.params;
-    const result = await client.query('SELECT * FROM workCard WHERE client_id= $1 ORDER BY id', [client_id]);
+
+    const result = await client.query(`
+        SELECT 
+          workCard.*, 
+          client.name AS client_name, 
+          artist.name AS artist_name, 
+          openWork.title AS work_title
+        FROM workCard
+        JOIN client ON workCard.client_id = client.id
+        JOIN artist ON workCard.artist_id = artist.id
+        JOIN openWork ON workCard.openwork_id = openWork.id
+        WHERE workCard.client_id = $1
+        ORDER BY workCard.id
+      `, [client_id]);
 
     let workCard = result.rows;
     res.json(workCard);
