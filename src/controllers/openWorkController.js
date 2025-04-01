@@ -69,6 +69,11 @@ const takeOpenWork = async (req, res) => {
             return;
         }
 
+        if (openWork.status === "confirmed") {
+            res.json({ estado: "Solicitud ya confirmada." });
+            return;
+        }
+
         actualState = openWork.status;
 
         if (actualState === "open") {
@@ -123,7 +128,7 @@ const confirmOpenWork = async (req, res) => {
             res.json({ estado: "Solicitud de trabajo no encontrada" });
             return;
         }
-        
+
         let openWork = result.rows[0];
 
         if (openWork.status !== "taken" || openWork.artist_id === 0) {
@@ -151,6 +156,13 @@ const confirmOpenWork = async (req, res) => {
 const deleteOpenWork = async (req, res) => {
     const { id } = req.params;
 
+    const result = await client.query('SELECT * FROM openWork WHERE id= $1', [id]);
+
+    if (result.rows[0].status === "taken") {
+        res.json({ estado: "Solicitud ya aceptada." });
+        return;
+    }
+
     await client.query('DELETE FROM openWork WHERE id = $1', [id]);
     res.json({ estado: "Solicitud de trabajo borrada correctamente" });
 };
@@ -159,7 +171,7 @@ const uploadOpenWork = async (req, res) => {
     const { artist_id, client_id, title, content, sfw_status } = req.body;
     const creationDate = new Date().toISOString().slice(0, 19).replace('T', ' ');
 
-    await client.query(`INSERT INTO openWork (artist_id, client_id, status, title, content, sfw_status, creation_date) VALUES ($1, $2, $3, $4, $5, $6, $7)`, [artist_id, client_id, "open", title, content, sfw_status, creationDate]);
+    await client.query(`INSERT INTO openWork (artist_id, client_id, status, title, content, creation_date, sfw_status) VALUES ($1, $2, $3, $4, $5, $6, $7)`, [artist_id, client_id, "open", title, content, creationDate, sfw_status]);
     res.json({ estado: "Solicitud de trabajo creada correctamente" });
 }
 
