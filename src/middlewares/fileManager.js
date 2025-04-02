@@ -1,17 +1,6 @@
 const multer = require('multer');
 
-const storage = multer.diskStorage({
-    destination: function (req, file, callback) {
-        callback(null, 'C:/Users/Garo/Desktop/PersonalProjects/CommisionArte-Back/uploads');
-    },
-    filename: function (req, file, callback) {
-        // You can write your own logic to define the filename here (before passing it into the callback), e.g:
-        //console.log(file.originalname); // User-defined filename is available
-        const filename = `image_${crypto.randomUUID()}.png`; // Create custom filename (crypto.randomUUID available in Node 19.0.0+ only)
-        req.res.locals.fileName = filename;
-        callback(null, filename);
-    }
-})
+const storage = multer.memoryStorage();
 
 const upload = multer({
     storage: storage,

@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const portfolioController = require('../controllers/portfolioController.js');
 const { asyncErrorHandler } = require('../middlewares/errors.js');
+//const { readBodyBeforeUpload, uploadImageChek } = require('../middlewares/uploadImagesLimit.js');
 const { upload } = require('../middlewares/fileManager.js');
 
 router.get('/', asyncErrorHandler(portfolioController.getPortfolio));
