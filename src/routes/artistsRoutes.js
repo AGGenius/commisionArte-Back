@@ -9,7 +9,6 @@ router.get('/:id', asyncErrorHandler( artistsController.getArtistByID));
 router.post('/login', validLoginData, asyncErrorHandler(artistsController.loginArtist));
 router.put('/:id',  asyncErrorHandler(artistsController.editArtist));
 router.put('/editInfo/:id', validUserData, asyncErrorHandler(artistsController.editArtistByArtist));
-router.put('/editInfoPass/:id', validUserData, asyncErrorHandler(artistsController.editArtistByArtist));
 router.delete('/:id', asyncErrorHandler(artistsController.deletArtistByArtist));
 router.post('/register', asyncErrorHandler(artistsController.registerArtist));
 

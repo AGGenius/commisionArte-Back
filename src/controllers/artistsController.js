@@ -35,19 +35,21 @@ const editArtistByArtist = async (req, res) => {
     const { id } = req.params;
     const { name, nick, email, sfw_status, comm_status, acount_status, styles} = req.body;
 
-    if(res.locals.verifiedUser) {
+    console.log(req.body)
 
-        if(res.locals.newPasword) {
-            const newSecurePassword = await bcryp.hash(res.locals.newPasword, 10);
-            await client.query('UPDATE artist SET name = $2, nick = $3, email = $4, sfw_status = $5, comm_status = $6, acount_status = $7, styles = $8, password = $9 WHERE id = $1', [id, name, nick, email, sfw_status, comm_status, acount_status, styles, newSecurePassword]);
-            res.json({ estado: "Usuario actualizado correctamente" });
-        } else {
-            await client.query('UPDATE artist SET name = $2, nick = $3, email = $4, sfw_status = $5, comm_status = $6, acount_status = $7, styles = $8 WHERE id = $1', [id, name, nick, email, sfw_status, comm_status, acount_status, styles]);
-            res.json({ estado: "Usuario actualizado correctamente" });
-        }
-    } else {
-        res.json({ estado: "Contraseña incorrecta" });
-    }
+    // if(res.locals.verifiedUser) {
+
+    //     if(res.locals.newPasword) {
+    //         const newSecurePassword = await bcryp.hash(res.locals.newPasword, 10);
+    //         await client.query('UPDATE artist SET name = $2, nick = $3, email = $4, sfw_status = $5, comm_status = $6, acount_status = $7, styles = $8, password = $9 WHERE id = $1', [id, name, nick, email, sfw_status, comm_status, acount_status, styles, newSecurePassword]);
+    //         res.json({ estado: "Usuario actualizado correctamente" });
+    //     } else {
+    //         await client.query('UPDATE artist SET name = $2, nick = $3, email = $4, sfw_status = $5, comm_status = $6, acount_status = $7, styles = $8 WHERE id = $1', [id, name, nick, email, sfw_status, comm_status, acount_status, styles]);
+    //         res.json({ estado: "Usuario actualizado correctamente" });
+    //     }
+    // } else {
+    //     res.json({ estado: "Contraseña incorrecta" });
+    // }
 }
 
 const deletArtistByArtist = async (req, res) => {

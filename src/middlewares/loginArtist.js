@@ -28,20 +28,12 @@ const validLoginData = async (req, res, next) => {
 
 const validUserData = async (req, res, next) => {
     const { id } = req.params;
-    const { password, pass1, pass2 } = req.body;
+    const { password} = req.body;
     
     const result = await client.query('SELECT * FROM artist WHERE id = $1', [id]);
 
-    if(pass1 && pass2) {
-        if(pass1 === pass2) {
-            res.locals.newPasword = pass1;
-        } else {      
-            return res.status(401).json({ errors: 'Las contraseñas no coinciden' });
-        }
-    }
-
     if (result.rows.length === 0) {
-        return res.status(401).json({ errors: 'Credenciales incorrectas' });
+        return res.status(401).json({ errors: 'Usuario no encontrado' });
     }
 
     const artist = result.rows[0];
