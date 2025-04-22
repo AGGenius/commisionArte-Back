@@ -25,7 +25,7 @@ const getArtistByID = async (req, res) => {
 
 const editArtist = async (req, res) => {
     const { id } = req.params;
-    const { name, nick, email, sfw_status, comm_status, acount_status, styles, reputation} = req.body;
+    const { name, nick, email, sfw_status, comm_status, acount_status, styles, reputation } = req.body;
 
     await client.query('UPDATE artist SET name = $2, nick = $3, email = $4, sfw_status = $5, comm_status = $6, acount_status = $7, styles = $8, reputation = $9 WHERE id = $1', [id, name, nick, email, sfw_status, comm_status, acount_status, styles, reputation]);
     res.json({ estado: "Artista actualizado correctamente" });
@@ -33,23 +33,36 @@ const editArtist = async (req, res) => {
 
 const editArtistByArtist = async (req, res) => {
     const { id } = req.params;
-    const { name, nick, email, sfw_status, comm_status, acount_status, styles} = req.body;
+    const { name, nick, email, contactEmail, sfw_status, comm_status, styles, telephone, newPassword } = req.body;
 
-    console.log(req.body)
+    if (res.locals.verifiedUser) {
+        const actualUser = res.locals.verifiedUser;
+        delete actualUser.password;
 
-    // if(res.locals.verifiedUser) {
+        if (newPassword) {
+            const newSecurePassword = await bcryp.hash(newPassword, 10);
+            await client.query('UPDATE artist SET name = $2, nick = $3, email = $4, contact_email = $5, sfw_status = $6, comm_status = $7, styles = $8, telephone = $9, password = $10 WHERE id = $1',
+                [id, name, nick, email, contactEmail, sfw_status, comm_status, styles, telephone, newSecurePassword]);
 
-    //     if(res.locals.newPasword) {
-    //         const newSecurePassword = await bcryp.hash(res.locals.newPasword, 10);
-    //         await client.query('UPDATE artist SET name = $2, nick = $3, email = $4, sfw_status = $5, comm_status = $6, acount_status = $7, styles = $8, password = $9 WHERE id = $1', [id, name, nick, email, sfw_status, comm_status, acount_status, styles, newSecurePassword]);
-    //         res.json({ estado: "Usuario actualizado correctamente" });
-    //     } else {
-    //         await client.query('UPDATE artist SET name = $2, nick = $3, email = $4, sfw_status = $5, comm_status = $6, acount_status = $7, styles = $8 WHERE id = $1', [id, name, nick, email, sfw_status, comm_status, acount_status, styles]);
-    //         res.json({ estado: "Usuario actualizado correctamente" });
-    //     }
-    // } else {
-    //     res.json({ estado: "Contraseña incorrecta" });
-    // }
+            const result = await client.query('SELECT * FROM artist WHERE id= $1', [id]);
+            let artist = result.rows[0];
+            delete artist.password;
+
+            res.json({ artist, estado: "Usuario actualizado correctamente" });
+        } else {
+            await client.query('UPDATE artist SET name = $2, nick = $3, email = $4, contact_email = $5, sfw_status = $6, comm_status = $7, styles = $8, telephone = $9 WHERE id = $1',
+                [id, name, nick, email, contactEmail, sfw_status, comm_status, styles, telephone]);
+
+            const result = await client.query('SELECT * FROM artist WHERE id= $1', [id]);
+            let artist = result.rows[0];
+            delete artist.password;
+
+            res.json({ artist, estado: "Usuario actualizado correctamente" });
+        }
+
+    } else {
+        res.json({ estado: "Contraseña incorrecta" });
+    }
 }
 
 const deletArtistByArtist = async (req, res) => {
@@ -60,11 +73,11 @@ const deletArtistByArtist = async (req, res) => {
 };
 
 const registerArtist = async (req, res) => {
-    const { name, nick, email, contactEmail, telephone, password, acountType} = req.body;
+    const { name, nick, email, contactEmail, telephone, password, acountType } = req.body;
     const securePassword = await bcryp.hash(password, 10);
     const registerDate = new Date().toISOString().slice(0, 19).replace('T', ' ');
 
-    await client.query(`INSERT INTO artist (name, nick, email, contact_email, telephone, password, sfw_status, comm_status, acount_status, register, acount_type, styles, reputation) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)`, 
+    await client.query(`INSERT INTO artist (name, nick, email, contact_email, telephone, password, sfw_status, comm_status, acount_status, register, acount_type, styles, reputation) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)`,
         [name, nick, email, contactEmail, telephone, securePassword, true, false, true, registerDate, acountType, "empty", 0]);
     res.json({ estado: "Usuario creado correctamente" });
 }

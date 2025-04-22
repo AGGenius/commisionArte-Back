@@ -28,7 +28,7 @@ const validLoginData = async (req, res, next) => {
 
 const validUserData = async (req, res, next) => {
     const { id } = req.params;
-    const { password} = req.body;
+    const { password } = req.body;
     
     const result = await client.query('SELECT * FROM artist WHERE id = $1', [id]);
 
@@ -47,8 +47,7 @@ const validUserData = async (req, res, next) => {
     if (!verifiedUser) {
         return res.status(401).json({ errors: 'Credenciales incorrectas' });
     };
-
-    res.locals.verifiedUser = artist;
+    
 	next();
 }
 
