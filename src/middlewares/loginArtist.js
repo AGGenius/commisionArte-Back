@@ -33,19 +33,20 @@ const validUserData = async (req, res, next) => {
     const result = await client.query('SELECT * FROM artist WHERE id = $1', [id]);
 
     if (result.rows.length === 0) {
-        return res.status(401).json({ errors: 'Usuario no encontrado' });
+        return res.json({ estado: 'Usuario no encontrado' });
     }
 
     const artist = result.rows[0];
 
     if (!artist.acount_status) {
-        return res.status(401).json({ errors: 'Usuario inactivo' });
+        return res.json({ estado: 'Usuario inactivo' });
     };
 
     const verifiedUser = await bcryp.compare(password, artist.password);
+    res.locals.verifiedUser = verifiedUser;
 
     if (!verifiedUser) {
-        return res.status(401).json({ errors: 'Credenciales incorrectas' });
+        return res.json({ estado: 'Credenciales incorrectas' });        
     };
     
 	next();

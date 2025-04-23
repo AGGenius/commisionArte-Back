@@ -36,8 +36,6 @@ const editArtistByArtist = async (req, res) => {
     const { name, nick, email, contactEmail, sfw_status, comm_status, styles, telephone, newPassword } = req.body;
 
     if (res.locals.verifiedUser) {
-        const actualUser = res.locals.verifiedUser;
-        delete actualUser.password;
 
         if (newPassword) {
             const newSecurePassword = await bcryp.hash(newPassword, 10);
@@ -59,7 +57,6 @@ const editArtistByArtist = async (req, res) => {
 
             res.json({ artist, estado: "Usuario actualizado correctamente" });
         }
-
     } else {
         res.json({ estado: "Contraseña incorrecta" });
     }
