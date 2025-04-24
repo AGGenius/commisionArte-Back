@@ -43,19 +43,19 @@ const editArtistByArtist = async (req, res) => {
                 [id, name, nick, email, contactEmail, sfw_status, comm_status, styles, telephone, newSecurePassword]);
 
             const result = await client.query('SELECT * FROM artist WHERE id= $1', [id]);
-            let artist = result.rows[0];
-            delete artist.password;
+            let editedArtist = result.rows[0];
+            delete editedArtist.password;
 
-            res.json({ artist, estado: "Usuario actualizado correctamente" });
+            res.json({ editedArtist, estado: "Usuario actualizado correctamente" });
         } else {
             await client.query('UPDATE artist SET name = $2, nick = $3, email = $4, contact_email = $5, sfw_status = $6, comm_status = $7, styles = $8, telephone = $9 WHERE id = $1',
                 [id, name, nick, email, contactEmail, sfw_status, comm_status, styles, telephone]);
 
             const result = await client.query('SELECT * FROM artist WHERE id= $1', [id]);
-            let artist = result.rows[0];
-            delete artist.password;
+            let editedArtist = result.rows[0];
+            delete editedArtist.password;
 
-            res.json({ artist, estado: "Usuario actualizado correctamente" });
+            res.json({ editedArtist, estado: "Usuario actualizado correctamente" });
         }
     } else {
         res.json({ estado: "Contraseña incorrecta" });

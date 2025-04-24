@@ -9,7 +9,6 @@ router.get('/:id', asyncErrorHandler( clientsController.getClientByID));
 router.post('/login', validLoginData, asyncErrorHandler(clientsController.loginClient));
 router.put('/:id',  asyncErrorHandler(clientsController.editClient));
 router.put('/editInfo/:id', validUserData, asyncErrorHandler(clientsController.editClientByClient));
-router.put('/editInfoPass/:id', validUserData, asyncErrorHandler(clientsController.editClientByClient));
 router.delete('/:id', asyncErrorHandler(clientsController.deletClientByClient));
 router.post('/register', asyncErrorHandler(clientsController.registerClient));
 

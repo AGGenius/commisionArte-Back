@@ -33,17 +33,30 @@ const editClient = async (req, res) => {
 
 const editClientByClient = async (req, res) => {
     const { id } = req.params;
-    const { name, nick, email, sfw_status, acount_status} = req.body;
+    const { name, nick, email, contactEmail, sfw_status, telephone, newPassword } = req.body;
 
-    if(res.locals.verifiedUser) {
+    
+    if (res.locals.verifiedUser) {
 
-        if(res.locals.newPasword) {
-            const newSecurePassword = await bcryp.hash(res.locals.newPasword, 10);
-            await client.query('UPDATE client SET name = $2, nick = $3, email = $4, sfw_status = $5, acount_status = $6, password = $7 WHERE id = $1', [id, name, nick, email, sfw_status, acount_status, newSecurePassword]);
-            res.json({ estado: "Cliente actualizado correctamente" });
+        if (newPassword) {
+            const newSecurePassword = await bcryp.hash(newPassword, 10);
+            await client.query('UPDATE client SET name = $2, nick = $3, email = $4, contact_email = $5, sfw_status = $6, telephone = $7, password = $8 WHERE id = $1',
+                [id, name, nick, email, contactEmail, sfw_status, telephone, newSecurePassword]);
+
+            const result = await client.query('SELECT * FROM client WHERE id= $1', [id]);
+            let editedClient = result.rows[0];
+            delete editedClient.password;
+
+            res.json({ editedClient, estado: "Usuario actualizado correctamente" });
         } else {
-            await client.query('UPDATE client SET name = $2, nick = $3, email = $4, sfw_status = $5, acount_status = $6 WHERE id = $1', [id, name, nick, email, sfw_status, acount_status]);
-            res.json({ estado: "Cliente actualizado correctamente" });
+            await client.query('UPDATE client SET name = $2, nick = $3, email = $4, contact_email = $5, sfw_status = $6, telephone = $7 WHERE id = $1',
+                [id, name, nick, email, contactEmail, sfw_status, telephone]);
+
+            const result = await client.query('SELECT * FROM client WHERE id= $1', [id]);
+            let editedClient = result.rows[0];
+            delete editedClient.password;
+
+            res.json({ editedClient, estado: "Usuario actualizado correctamente" });
         }
     } else {
         res.json({ estado: "Contraseña incorrecta" });
