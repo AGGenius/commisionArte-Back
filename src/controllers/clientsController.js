@@ -67,7 +67,7 @@ const deletClientByClient = async (req, res) => {
     const { id } = req.params;
 
     await client.query('DELETE FROM client WHERE id = $1', [id]);
-    res.json({ estado: "Usuario borrado correctamente" });
+    res.json({ estate: "Usuario borrado correctamente" });
 };
 
 const registerClient = async (req, res) => {
