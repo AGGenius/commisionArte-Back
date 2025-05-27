@@ -25,9 +25,9 @@ const getArtistByID = async (req, res) => {
 
 const editArtist = async (req, res) => {
     const { id } = req.params;
-    const { name, nick, email, sfw_status, comm_status, acount_status, styles, reputation } = req.body;
+    const { name, nick, email, sfw_status, comm_status, account_status, styles, reputation } = req.body;
 
-    await client.query('UPDATE artist SET name = $2, nick = $3, email = $4, sfw_status = $5, comm_status = $6, acount_status = $7, styles = $8, reputation = $9 WHERE id = $1', [id, name, nick, email, sfw_status, comm_status, acount_status, styles, reputation]);
+    await client.query('UPDATE artist SET name = $2, nick = $3, email = $4, sfw_status = $5, comm_status = $6, account_status = $7, styles = $8, reputation = $9 WHERE id = $1', [id, name, nick, email, sfw_status, comm_status, account_status, styles, reputation]);
     res.json({ estado: "Artista actualizado correctamente" });
 }
 
@@ -70,19 +70,19 @@ const deletArtistByArtist = async (req, res) => {
 };
 
 const registerArtist = async (req, res) => {
-    const { name, nick, email, contactEmail, telephone, password, acountType } = req.body;
+    const { name, nick, email, contactEmail, telephone, password, accountType } = req.body;
     const securePassword = await bcryp.hash(password, 10);
     const registerDate = new Date().toISOString().slice(0, 19).replace('T', ' ');
 
-    await client.query(`INSERT INTO artist (name, nick, email, contact_email, telephone, password, sfw_status, comm_status, acount_status, register, acount_type, styles, reputation) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)`,
-        [name, nick, email, contactEmail, telephone, securePassword, true, false, true, registerDate, acountType, "empty", 0]);
+    await client.query(`INSERT INTO artist (name, nick, email, contact_email, telephone, password, sfw_status, comm_status, account_status, register, account_type, styles, reputation) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)`,
+        [name, nick, email, contactEmail, telephone, securePassword, true, false, true, registerDate, accountType, "empty", 0]);
     res.json({ estado: "Usuario creado correctamente" });
 }
 
 const loginArtist = async (req, res) => {
     const artist = res.locals.verifiedUser;
 
-    const token = jwt.sign({ id: artist.id, email: artist.email, type: artist.acount_type, active: artist.acount_status }, "secreto", { expiresIn: '1h' });
+    const token = jwt.sign({ id: artist.id, email: artist.email, type: artist.account_type, active: artist.account_status }, "secreto", { expiresIn: '1h' });
     res.json({ token, userId: artist.id });
 }
 

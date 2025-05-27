@@ -25,9 +25,9 @@ const getClientByID = async (req, res) => {
 
 const editClient = async (req, res) => {
     const { id } = req.params;
-    const { name, nick, email, sfw_status, acount_status, reputation} = req.body;
+    const { name, nick, email, sfw_status, account_status, reputation} = req.body;
 
-    await client.query('UPDATE client SET name = $2, nick = $3, email = $4, sfw_status = $5, acount_status = $6, reputation = $7 WHERE id = $1', [id, name, nick, email, sfw_status, acount_status, reputation]);
+    await client.query('UPDATE client SET name = $2, nick = $3, email = $4, sfw_status = $5, account_status = $6, reputation = $7 WHERE id = $1', [id, name, nick, email, sfw_status, account_status, reputation]);
     res.json({ estado: "Cliente actualizado correctamente" });
 }
 
@@ -71,19 +71,19 @@ const deletClientByClient = async (req, res) => {
 };
 
 const registerClient = async (req, res) => {
-    const { name, nick, email, contactEmail, telephone, password, acountType} = req.body;
+    const { name, nick, email, contactEmail, telephone, password, accountType} = req.body;
     const securePassword = await bcryp.hash(password, 10);
     const registerDate = new Date().toISOString().slice(0, 19).replace('T', ' ');
 
-    await client.query(`INSERT INTO client (name, nick, email, contact_email, telephone, password, sfw_status, acount_type, acount_status, register, reputation) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)`, 
-        [name, nick, email, contactEmail, telephone, securePassword, true, acountType, true, registerDate , 0]);
+    await client.query(`INSERT INTO client (name, nick, email, contact_email, telephone, password, sfw_status, account_type, account_status, register, reputation) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)`, 
+        [name, nick, email, contactEmail, telephone, securePassword, true, accountType, true, registerDate , 0]);
     res.json({ estado: "Cliente creado correctamente" });
 }
 
 const loginClient = async (req, res) => {
     const artist = res.locals.verifiedUser;
 
-    const token = jwt.sign({ id: artist.id, email: artist.email, type: artist.acount_type, active: artist.acount_status }, "secreto", { expiresIn: '1h' });
+    const token = jwt.sign({ id: artist.id, email: artist.email, type: artist.account_type, active: artist.account_status }, "secreto", { expiresIn: '1h' });
     res.json({ token, userId: artist.id });
 }
 

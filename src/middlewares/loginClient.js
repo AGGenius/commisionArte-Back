@@ -12,7 +12,7 @@ const validLoginData = async (req, res, next) => {
 
     const clientData = result.rows[0];
 
-    if (!clientData.acount_status) {
+    if (!clientData.account_status) {
         return res.status(401).json({ errors: 'Usuario inactivo' });
     };
 
@@ -38,7 +38,7 @@ const validUserData = async (req, res, next) => {
 
     const clientData = result.rows[0];
 
-    if (!clientData.acount_status) {
+    if (!clientData.account_status) {
         return res.json({ estado: 'Usuario inactivo' });
     };
 
