@@ -64,7 +64,9 @@ const editClientByClient = async (req, res) => {
 }
 
 const rateUserClient = async (req, res) => {
-    const { rateValue, artistId, clientId } = req.body;
+    const { rateValue, artistId, clientId, workcardId } = req.body;
+    
+    await client.query('UPDATE workcard SET client_rated = $2 WHERE id = $1', [workcardId, true]);
 
     await client.query('UPDATE client SET reputation = reputation + $2 WHERE id = $1',
         [clientId, rateValue]);

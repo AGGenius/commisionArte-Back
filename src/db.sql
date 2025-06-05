@@ -61,7 +61,9 @@ CREATE TABLE workCard (
 	status VARCHAR(50) NOT NULL,
 	commentary VARCHAR(255) NOT NULL,
 	creation_date DATE NOT NULL,
-	last_modification_date DATE NOT NULL
+	last_modification_date DATE NOT NULL,
+	artist_rated BOOLEAN,
+	client_rated BOOLEAN
 );
 
 CREATE TABLE messages (
