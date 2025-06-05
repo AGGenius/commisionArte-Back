@@ -62,6 +62,18 @@ const editArtistByArtist = async (req, res) => {
     }
 }
 
+const rateUserArtist = async (req, res) => {
+    const { rateValue, artistId, clienId } = req.body;
+
+    await client.query('UPDATE artist SET reputation = reputation + $2 WHERE id = $1',
+        [artistId, rateValue]);
+
+    await client.query('UPDATE client SET reputation = reputation + 1 WHERE id = $1',
+        [clienId]);
+
+    res.json({ estado: "Usuario valorado correctamente" });
+}
+
 const deletArtistByArtist = async (req, res) => {
     const { id } = req.params;
 
@@ -87,4 +99,4 @@ const loginArtist = async (req, res) => {
 }
 
 
-module.exports = { getArtists, getArtistByID, loginArtist, editArtist, editArtistByArtist, deletArtistByArtist, registerArtist }
+module.exports = { getArtists, getArtistByID, loginArtist, editArtist, editArtistByArtist, rateUserArtist, deletArtistByArtist, registerArtist }

@@ -14,10 +14,19 @@ var storage = multer.diskStorage({
 });
 
 const getPortfolio = async (req, res) => {
-    const result = await client.query('SELECT * FROM portfolio ORDER BY id');
-    let portfolio = result.rows;
+    const logedStatus = req.query.logedStatus === 'true';
 
-    res.json(portfolio);
+    if (logedStatus) {
+        const result = await client.query('SELECT * FROM portfolio ORDER BY id');
+        let portfolio = result.rows;
+
+        res.json(portfolio);
+    } else {
+        const result = await client.query('SELECT * FROM portfolio WHERE sfw_status = true ORDER BY id');
+        let portfolio = result.rows;
+
+        res.json(portfolio);
+    }
 }
 
 const getPortfolioByID = async (req, res) => {
@@ -60,7 +69,7 @@ const getFilePath = (fileUrl) => {
 
 const deletePortfolio = async (req, res) => {
     const { id } = req.params;
-    
+
     const result = await client.query('SELECT * FROM portfolio WHERE id= $1', [id]);
 
     if (result.rows.length > 0) {
@@ -83,7 +92,7 @@ const deletePortfolio = async (req, res) => {
             }
         });
 
-        if(portfolioBlurredLocation !== "") {
+        if (portfolioBlurredLocation !== "") {
             fs.promises.unlink(portfolioBlurredLocation, (error) => {
                 if (error) {
                     console.log("Error al eliminar la imagen");
@@ -123,7 +132,7 @@ const uploadPortfolio = async (req, res) => {
     let blurredLocation = ("");
 
     //Maybe add compresion a resize.
-    if(sfw_status === "false") {
+    if (sfw_status === "false") {
         const blurredFilename = `blurred_${filename}`;
         blurredLocation = path.join('C:/Users/Garo/Desktop/PersonalProjects/CommisionArte-Back/uploads', blurredFilename);
 

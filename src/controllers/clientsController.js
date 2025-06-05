@@ -25,7 +25,7 @@ const getClientByID = async (req, res) => {
 
 const editClient = async (req, res) => {
     const { id } = req.params;
-    const { name, nick, email, sfw_status, account_status, reputation} = req.body;
+    const { name, nick, email, sfw_status, account_status, reputation } = req.body;
 
     await client.query('UPDATE client SET name = $2, nick = $3, email = $4, sfw_status = $5, account_status = $6, reputation = $7 WHERE id = $1', [id, name, nick, email, sfw_status, account_status, reputation]);
     res.json({ estado: "Cliente actualizado correctamente" });
@@ -35,7 +35,7 @@ const editClientByClient = async (req, res) => {
     const { id } = req.params;
     const { name, nick, email, contactEmail, sfw_status, telephone, newPassword } = req.body;
 
-    
+
     if (res.locals.verifiedUser) {
 
         if (newPassword) {
@@ -63,6 +63,18 @@ const editClientByClient = async (req, res) => {
     }
 }
 
+const rateUserClient = async (req, res) => {
+    const { rateValue, artistId, clientId } = req.body;
+
+    await client.query('UPDATE client SET reputation = reputation + $2 WHERE id = $1',
+        [clientId, rateValue]);
+
+    await client.query('UPDATE artist SET reputation = reputation + 1 WHERE id = $1',
+        [artistId]);
+
+    res.json({ estado: "Usuario valorado correctamente" });
+}
+
 const deletClientByClient = async (req, res) => {
     const { id } = req.params;
 
@@ -71,12 +83,12 @@ const deletClientByClient = async (req, res) => {
 };
 
 const registerClient = async (req, res) => {
-    const { name, nick, email, contactEmail, telephone, password, accountType} = req.body;
+    const { name, nick, email, contactEmail, telephone, password, accountType } = req.body;
     const securePassword = await bcryp.hash(password, 10);
     const registerDate = new Date().toISOString().slice(0, 19).replace('T', ' ');
 
-    await client.query(`INSERT INTO client (name, nick, email, contact_email, telephone, password, sfw_status, account_type, account_status, register, reputation) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)`, 
-        [name, nick, email, contactEmail, telephone, securePassword, true, accountType, true, registerDate , 0]);
+    await client.query(`INSERT INTO client (name, nick, email, contact_email, telephone, password, sfw_status, account_type, account_status, register, reputation) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)`,
+        [name, nick, email, contactEmail, telephone, securePassword, true, accountType, true, registerDate, 0]);
     res.json({ estado: "Cliente creado correctamente" });
 }
 
@@ -88,4 +100,4 @@ const loginClient = async (req, res) => {
 }
 
 
-module.exports = { getClients, getClientByID, editClient, editClientByClient, deletClientByClient, registerClient, loginClient }
+module.exports = { getClients, getClientByID, editClient, editClientByClient, rateUserClient, deletClientByClient, registerClient, loginClient }
