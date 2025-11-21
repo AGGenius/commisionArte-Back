@@ -110,18 +110,18 @@ const deletePortfolio = async (req, res) => {
 };
 
 const uploadPortfolio = async (req, res) => {
-    const { name, artist_id, styles, sfw_status } = req.body;
+    const { title, artist_id, styles, sfw_status } = req.body;
     const creationDate = new Date().toISOString().slice(0, 19).replace('T', ' ');
 
     if (!req.files || req.files.length === 0) {
         return res.status(400).json({ error: "No se subió ninguna imagen" });
-    }
+    };
 
     const result = await client.query('SELECT * FROM portfolio WHERE artist_id = $1', [artist_id]);
 
     if (result.rows.length >= 3) {
         return res.status(401).json({ error: 'Ya alcanzaste el límite de 3 imágenes' });
-    }
+    };
 
     const file = req.files[0];
     const filename = `image_${crypto.randomUUID()}.png`;
@@ -142,7 +142,7 @@ const uploadPortfolio = async (req, res) => {
 
     location = ('http://localhost:3000/' + filename);
 
-    await client.query(`INSERT INTO portfolio (name, artist_id, location, styles, sfw_status, blurred_location, upload_date) VALUES ($1, $2, $3, $4, $5, $6, $7)`, [name, artist_id, location, styles, sfw_status, blurredLocation, creationDate]);
+    await client.query(`INSERT INTO portfolio (name, artist_id, location, styles, sfw_status, blurred_location, upload_date) VALUES ($1, $2, $3, $4, $5, $6, $7)`, [title, artist_id, location, styles, sfw_status, blurredLocation, creationDate]);
     res.json({ estado: "Imagen guardada correctamente" });
 }
 

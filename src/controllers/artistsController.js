@@ -1,6 +1,8 @@
 const client = require('../db.js');
 const bcryp = require('bcrypt');
 const jwt = require('jsonwebtoken');
+const fs = require('fs');
+const path = require("path");
 
 const getArtists = async (req, res) => {
     const result = await client.query('SELECT * FROM artist ORDER BY id');
@@ -74,13 +76,60 @@ const rateUserArtist = async (req, res) => {
         [clientId]);
 
     res.json({ estado: "Usuario valorado correctamente" });
-}
+};
+
+const getFilePath = (fileUrl) => {
+    const UPLOADS_FOLDER = path.join(__dirname, '..', '..', 'uploads');
+    const fileName = path.basename(fileUrl); // Extrae solo el nombre del archivo
+    return path.join(UPLOADS_FOLDER, fileName); // Ajusta 'uploads' si es otro directorio
+};
 
 const deletArtistByArtist = async (req, res) => {
     const { id } = req.params;
 
-    await client.query('DELETE FROM artist WHERE id = $1', [id]);
-    res.json({ estate: "Usuario borrado correctamente" });
+    const artist_id = id;
+
+    const results = await client.query('SELECT * FROM portfolio where artist_id = $1', [artist_id]);
+
+    if (results.rows.length > 0) {
+        results.rows.forEach((result) => {
+            const portfolio = result;
+
+            let portfolioBaseLocation = portfolio.location;
+            let portfolioBlurredLocation = portfolio.blurred_location
+
+            if (portfolioBaseLocation.startsWith('http')) {
+                portfolioBaseLocation = getFilePath(portfolioBaseLocation);
+            }
+            if (portfolioBlurredLocation && portfolioBlurredLocation.startsWith('http')) {
+                portfolioBlurredLocation = getFilePath(portfolioBlurredLocation);
+            }
+
+            fs.promises.unlink(portfolioBaseLocation, (error) => {
+                if (error) {
+                    console.log("Error al eliminar la imagen");
+                    return res.status(500).json({ error: "No se pudo eliminar la imagen" });
+                };
+            });
+
+            if (portfolioBlurredLocation !== "") {
+                fs.promises.unlink(portfolioBlurredLocation, (error) => {
+                    if (error) {
+                        console.log("Error al eliminar la imagen");
+                        return res.status(500).json({ error: "No se pudo eliminar la imagen" });
+                    };
+                });
+            };
+
+        });
+    } else {
+        return res.status(404).json({ error: "Imagen no encontrada" });
+    };
+
+    await client.query('DELETE FROM portfolio WHERE artist_id = $1', [artist_id]);
+    await client.query('DELETE FROM artist WHERE id = $1', [artist_id]);
+    
+    res.json({ estate: "Artista y galeria asociada borrados correctamente." });
 };
 
 const registerArtist = async (req, res) => {
