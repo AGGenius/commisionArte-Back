@@ -5,6 +5,7 @@ const { validLoginData, validUserData } = require('../middlewares/loginArtist.js
 const { asyncErrorHandler } = require('../middlewares/errors.js');
 
 router.get('/', asyncErrorHandler(artistsController.getArtists));
+router.get('/artistname/:id', asyncErrorHandler( artistsController.getArtistNameByID));
 router.get('/:id', asyncErrorHandler( artistsController.getArtistByID));
 router.post('/login', validLoginData, asyncErrorHandler(artistsController.loginArtist));
 router.put('/editInfo/:id', validUserData, asyncErrorHandler(artistsController.editArtistByArtist));

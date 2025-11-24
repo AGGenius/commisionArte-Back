@@ -22,8 +22,20 @@ const getArtistByID = async (req, res) => {
         res.json(artist);
     } else {
         res.json({ estado: "Artista no encontrado" })
-    }
-}
+    };
+};
+
+const getArtistNameByID = async (req, res) => {
+    const { id } = req.params;
+    const result = await client.query('SELECT name FROM artist WHERE id= $1', [id]);
+
+    if (result.rows.length > 0) {
+        let artist = result.rows[0];
+        res.json(artist);
+    } else {
+        res.json({ estado: "Artista no encontrado" })
+    };
+};
 
 const editArtist = async (req, res) => {
     const { id } = req.params;
@@ -31,7 +43,7 @@ const editArtist = async (req, res) => {
 
     await client.query('UPDATE artist SET name = $2, nick = $3, email = $4, sfw_status = $5, comm_status = $6, account_status = $7, styles = $8, reputation = $9 WHERE id = $1', [id, name, nick, email, sfw_status, comm_status, account_status, styles, reputation]);
     res.json({ estado: "Artista actualizado correctamente" });
-}
+};
 
 const editArtistByArtist = async (req, res) => {
     const { id } = req.params;
@@ -62,7 +74,7 @@ const editArtistByArtist = async (req, res) => {
     } else {
         res.json({ estado: "Contraseña incorrecta" });
     }
-}
+};
 
 const rateUserArtist = async (req, res) => {
     const { rateValue, artistId, clientId, workcardId } = req.body;
@@ -150,4 +162,4 @@ const loginArtist = async (req, res) => {
 }
 
 
-module.exports = { getArtists, getArtistByID, loginArtist, editArtist, editArtistByArtist, rateUserArtist, deletArtistByArtist, registerArtist }
+module.exports = { getArtists, getArtistByID, getArtistNameByID, loginArtist, editArtist, editArtistByArtist, rateUserArtist, deletArtistByArtist, registerArtist }
