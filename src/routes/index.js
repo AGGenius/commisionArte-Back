@@ -7,6 +7,7 @@ const stateCardsRoutes = require('./stateCardRoutes.js');
 const openWorkRoutes = require('./openWorkRoutes.js');
 const messageRoutes = require('./messageRoutes.js');
 const rejectedWorks = require('./rejectedWorks.js');
+const weatherRoutes = require('./weatherRoutes.js')
 
 router.use('/api/artists', artistsRoutes);
 router.use('/api/clients', clientsRoutes);
@@ -15,5 +16,6 @@ router.use('/api/stateCards', stateCardsRoutes);
 router.use('/api/openWorks', openWorkRoutes);
 router.use('/api/messages', messageRoutes);
 router.use('/api/rejected', rejectedWorks);
+router.use('/api/weather', weatherRoutes);
 
 module.exports = router

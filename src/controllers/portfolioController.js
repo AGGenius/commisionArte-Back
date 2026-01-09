@@ -49,7 +49,7 @@ const getPortfolioByArtistID = async (req, res) => {
         let portfolio = result.rows;
         res.json(portfolio);
     } else {
-        res.json({ estado: "Imagenes no encontradas" })
+        //res.json({ estado: "Imagenes no encontradas" })
     }
 }
 
