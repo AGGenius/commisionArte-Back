@@ -7,9 +7,9 @@ const { asyncErrorHandler } = require('../middlewares/errors.js');
 router.get('/', asyncErrorHandler(clientsController.getClients));
 router.get('/:id', asyncErrorHandler( clientsController.getClientByID));
 router.post('/login', validLoginData, asyncErrorHandler(clientsController.loginClient));
-router.put('/:id',  asyncErrorHandler(clientsController.editClient));
 router.put('/editInfo/:id', validUserData, asyncErrorHandler(clientsController.editClientByClient));
-router.put('/editInfoPass/:id', validUserData, asyncErrorHandler(clientsController.editClientByClient));
+router.put('/rateUser', asyncErrorHandler(clientsController.rateUserClient));
+router.put('/:id',  asyncErrorHandler(clientsController.editClient));
 router.delete('/:id', asyncErrorHandler(clientsController.deletClientByClient));
 router.post('/register', asyncErrorHandler(clientsController.registerClient));
 
