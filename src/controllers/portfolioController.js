@@ -2,6 +2,7 @@ const client = require('../db.js');
 const multer = require('multer');
 const path = require("path");
 const sharp = require("sharp");
+require('dotenv').config();
 const fs = require('fs');
 
 var storage = multer.diskStorage({
@@ -126,7 +127,7 @@ const uploadPortfolio = async (req, res) => {
     const file = req.files[0];
     const filename = `image_${crypto.randomUUID()}.png`;
 
-    let location = path.join('C:/Users/Garo/Desktop/PersonalProjects/CommisionArte-Back/uploads', filename);
+    let location = path.join(`${process.env.BACK_UPLOAD_DIR}`, filename);
     fs.writeFileSync(location, file.buffer);
 
     let blurredLocation = ("");
@@ -134,7 +135,7 @@ const uploadPortfolio = async (req, res) => {
     //Maybe add compresion a resize.
     if (sfw_status === "false") {
         const blurredFilename = `blurred_${filename}`;
-        blurredLocation = path.join('C:/Users/Garo/Desktop/PersonalProjects/CommisionArte-Back/uploads', blurredFilename);
+        blurredLocation = path.join(`${process.env.BACK_UPLOAD_DIR}`, blurredFilename);
 
         await sharp(location).blur(200).toFile(blurredLocation);
         blurredLocation = ('http://localhost:3000/' + blurredFilename);
