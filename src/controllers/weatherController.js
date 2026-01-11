@@ -1,7 +1,6 @@
 require('dotenv').config();
 
 const getWeatherReportForCurrentDay = async (req, res) => {
-    console.log("1")
     try {
         const WEATHER_KEY = process.env.OPENWEATHER_API_KEY;
         const { lat, lon } = req.query;

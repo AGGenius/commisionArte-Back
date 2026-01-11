@@ -2,17 +2,9 @@ const client = require('../db.js');
 const multer = require('multer');
 const path = require("path");
 const sharp = require("sharp");
+const cloudinary = require("../cloudinary.js");
 require('dotenv').config();
 const fs = require('fs');
-
-var storage = multer.diskStorage({
-    destination: function (req, file, cb) {
-        cb(null, '/tmp/my-uploads') // your path
-    },
-    filename: function (req, file, cb) {
-        cb(null, file.fieldname + '-' + Date.now())
-    }
-});
 
 const getPortfolio = async (req, res) => {
     const logedStatus = req.query.logedStatus === 'true';
@@ -51,8 +43,8 @@ const getPortfolioByArtistID = async (req, res) => {
         res.json(portfolio);
     } else {
         //res.json({ estado: "Imagenes no encontradas" })
-    }
-}
+    };
+};
 
 const editPortfolio = async (req, res) => {
     const { id } = req.params;
@@ -60,12 +52,6 @@ const editPortfolio = async (req, res) => {
 
     await client.query('UPDATE portfolio SET name = $2, sfw_status = $3, styles = $4 WHERE id = $1', [id, name, sfw_status, styles]);
     res.json({ estado: "Imagen actualizada correctamente" });
-}
-
-const getFilePath = (fileUrl) => {
-    const UPLOADS_FOLDER = path.join(__dirname, '..', '..', 'uploads');
-    const fileName = path.basename(fileUrl); // Extrae solo el nombre del archivo
-    return path.join(UPLOADS_FOLDER, fileName); // Ajusta 'uploads' si es otro directorio
 };
 
 const deletePortfolio = async (req, res) => {
@@ -74,33 +60,27 @@ const deletePortfolio = async (req, res) => {
     const result = await client.query('SELECT * FROM portfolio WHERE id= $1', [id]);
 
     if (result.rows.length > 0) {
-        let portfolio = result.rows[0];
+        const portfolio = result.rows[0];
 
-        let portfolioBaseLocation = portfolio.location;
-        let portfolioBlurredLocation = portfolio.blurred_location
+        if (portfolio.location && portfolio.location.startsWith("http")) {
+            const publicId = getPublicIdFromUrl(portfolio.location);
+            try {
+                await cloudinary.uploader.destroy(publicId);
+                console.log(`Borrada imagen principal de Cloudinary: ${publicId}`);
+            } catch (err) {
+                console.error("Error borrando imagen principal de Cloudinary:", err.message);
+            };
+        };
 
-        if (portfolioBaseLocation.startsWith('http')) {
-            portfolioBaseLocation = getFilePath(portfolioBaseLocation);
-        }
-        if (portfolioBlurredLocation && portfolioBlurredLocation.startsWith('http')) {
-            portfolioBlurredLocation = getFilePath(portfolioBlurredLocation);
-        }
-
-        fs.promises.unlink(portfolioBaseLocation, (error) => {
-            if (error) {
-                console.log("Error al eliminar la imagen");
-                return res.status(500).json({ error: "No se pudo eliminar la imagen" });
-            }
-        });
-
-        if (portfolioBlurredLocation !== "") {
-            fs.promises.unlink(portfolioBlurredLocation, (error) => {
-                if (error) {
-                    console.log("Error al eliminar la imagen");
-                    return res.status(500).json({ error: "No se pudo eliminar la imagen" });
-                }
-            });
-        }
+        if (portfolio.blurred_location && portfolio.blurred_location.startsWith("http")) {
+            const publicIdBlurred = getPublicIdFromUrl(portfolio.blurred_location);
+            try {
+                await cloudinary.uploader.destroy(publicIdBlurred);
+                console.log(`Borrada imagen difuminada de Cloudinary: ${publicIdBlurred}`);
+            } catch (err) {
+                console.error("Error borrando imagen difuminada de Cloudinary:", err.message);
+            };
+        };
 
     } else {
         return res.status(404).json({ error: "Imagen no encontrada" });
@@ -108,6 +88,12 @@ const deletePortfolio = async (req, res) => {
 
     await client.query('DELETE FROM portfolio WHERE id = $1', [id]);
     res.json({ estado: "Imagen borrada correctamente" });
+};
+
+const getPublicIdFromUrl = (url) => {
+    const parts = url.split("/");
+    const folderAndFile = parts.slice(-2).join("/");
+    return folderAndFile.replace(/\.[^/.]+$/, "");
 };
 
 const uploadPortfolio = async (req, res) => {
@@ -127,23 +113,28 @@ const uploadPortfolio = async (req, res) => {
     const file = req.files[0];
     const filename = `image_${crypto.randomUUID()}.png`;
 
-    let location = path.join(`${process.env.BACK_UPLOAD_DIR}`, filename);
-    fs.writeFileSync(location, file.buffer);
+    const uploadToCloudinary = (buffer, folderName) =>
+        new Promise((resolve, reject) => {
+            const stream = cloudinary.uploader.upload_stream(
+                { folder: folderName, public_id: filename.replace(".png", ""), overwrite: true },
+                (error, result) => {
+                    if (error) return reject(error);
+                    resolve(result.secure_url);
+                }
+            );
+            stream.end(buffer);
+        });
+
+    const mainUrl = await uploadToCloudinary(file.buffer, "portfolio_images");
 
     let blurredLocation = ("");
 
-    //Maybe add compresion a resize.
     if (sfw_status === "false") {
-        const blurredFilename = `blurred_${filename}`;
-        blurredLocation = path.join(`${process.env.BACK_UPLOAD_DIR}`, blurredFilename);
+        const blurredBuffer = await sharp(file.buffer).blur(200).png().toBuffer();
+        blurredLocation = await uploadToCloudinary(blurredBuffer, "portfolio_images/blurred");
+    };
 
-        await sharp(location).blur(200).toFile(blurredLocation);
-        blurredLocation = ('http://localhost:3000/' + blurredFilename);
-    }
-
-    location = ('http://localhost:3000/' + filename);
-
-    await client.query(`INSERT INTO portfolio (name, artist_id, location, styles, sfw_status, blurred_location, upload_date) VALUES ($1, $2, $3, $4, $5, $6, $7)`, [title, artist_id, location, styles, sfw_status, blurredLocation, creationDate]);
+    await client.query(`INSERT INTO portfolio (name, artist_id, location, styles, sfw_status, blurred_location, upload_date) VALUES ($1, $2, $3, $4, $5, $6, $7)`, [title, artist_id, mainUrl, styles, sfw_status, blurredLocation, creationDate]);
     res.json({ estado: "Imagen guardada correctamente" });
 }
 
